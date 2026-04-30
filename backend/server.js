@@ -20,7 +20,10 @@ const inquiryRoutes = require("./routes/inquiryRoutes");
 
 // 🔥 CORS CONFIG (THIS IS THE FIX)
 app.use(cors({
-  origin: "http://localhost:3000", // frontend URL
+  origin: [
+    "http://localhost:3000",
+    "https://bodhi-prakashan.onrender.com"
+  ],
   credentials: true
 }));
 
@@ -49,8 +52,8 @@ app.use("/api/inquiries", inquiryRoutes);
 
 // DB
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("DB connected"))
-.catch(err => console.log(err));
+  .then(() => console.log("DB connected"))
+  .catch(err => console.log(err));
 
 // TEST
 app.get("/", (req, res) => {
