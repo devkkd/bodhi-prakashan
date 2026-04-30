@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { verifyOtp } from "@/lib/api";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function VerifyPage() {
+function VerifyContent() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -14,7 +14,6 @@ export default function VerifyPage() {
   const router = useRouter();
   const phone = searchParams.get("phone");
 
-  // Countdown timer logic
   useEffect(() => {
     if (timeLeft === 0) return;
     const intervalId = setInterval(() => {
@@ -23,7 +22,6 @@ export default function VerifyPage() {
     return () => clearInterval(intervalId);
   }, [timeLeft]);
 
-  // Handle OTP input changes
   const handleChange = (element, index) => {
     const value = element.value;
     if (isNaN(value)) return;
@@ -32,20 +30,17 @@ export default function VerifyPage() {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value !== "" && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
 
-  // Handle backspace auto-focus
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
-  // Handle pasting a 6-digit code
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
@@ -68,13 +63,9 @@ export default function VerifyPage() {
 
       const res = await verifyOtp({ phone, otp: otpString });
 
-      // 🔥 STORE TOKEN (IMPORTANT)
       localStorage.setItem("userToken", res.data.token);
-      localStorage.setItem("userMobile", phone); 
+      localStorage.setItem("userMobile", phone);
 
-      console.log("TOKEN:", res.data.token);
-
-      // ✅ redirect
       router.push("/store");
     } catch (err) {
       console.error("Verify failed", err);
@@ -88,8 +79,6 @@ export default function VerifyPage() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 font-sans">
-      
-      {/* Main Verify Card */}
       <div className="w-full max-w-[510px] bg-[#FDFBF7] border border-[#D0C5B7] rounded-[36px] p-8 md:p-12 shadow-sm">
         
         <h2 className="text-[24px] md:text-[28px] font-extrabold text-black mb-3">
@@ -101,7 +90,6 @@ export default function VerifyPage() {
           Didn't receive it? Resend in {timeLeft} seconds.
         </p>
 
-        {/* OTP Input Area */}
         <div className="mb-8">
           <label className="block text-[15px] font-bold text-black mb-3">
             One-time code / एक बार का कोड
@@ -123,19 +111,17 @@ export default function VerifyPage() {
           </div>
         </div>
 
-        {/* Timer Display */}
         <p className="text-[16px] text-black mb-6">
           Resend OTP in <span className="font-bold">{timeLeft} Sec.</span>
         </p>
 
-        {/* Dynamic Action Button */}
         <div className="flex justify-center mb-5">
           <button
             onClick={handleVerify}
             disabled={loading || !isOtpComplete}
-            className={`px-12 py-3.5 rounded-full font-bold text-[16px] text-black transition-all flex items-center justify-center gap-2 ${
+            className={`px-12 py-3.5 rounded-full font-bold text-[16px] text-black transition-all ${
               isOtpComplete 
-                ? "bg-[#FFAE79] hover:bg-[#ff9d61] shadow-sm" 
+                ? "bg-[#FFAE79] hover:bg-[#ff9d61]" 
                 : "bg-[#BCAFA0] cursor-not-allowed opacity-80"
             }`}
           >
@@ -143,19 +129,18 @@ export default function VerifyPage() {
           </button>
         </div>
 
-        {/* Security Footer */}
-        <p className="text-[14px] text-center text-black leading-relaxed opacity-90">
-          आपका नंबर सुरक्षित है | Your number is never shared, never sold.<br/>
-          Used only to keep your account safe.
+        <p className="text-[14px] text-center text-black opacity-90">
+          Your number is never shared.
         </p>
-        
       </div>
-
-      {/* Outside Footer Text */}
-      <div className="mt-5 text-[#F47C48] text-[18px] font-medium tracking-wide">
-        पढ़ते रहो । / Keep reading.
-      </div>
-
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }
