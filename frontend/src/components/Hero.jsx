@@ -22,9 +22,13 @@ const Hero = () => {
                         </p>
                     </div>
 
-                    <button className="mt-8 bg-[#111111] hover:bg-black text-white px-8 py-3 rounded-full inline-flex items-center gap-3 font-medium transition-transform hover:scale-105">
+                    <button className="mt-8 bg-[#111111] hover:bg-black text-white px-6 py-3 rounded-full inline-flex items-center gap-3 font-medium transition-transform hover:scale-105">
                         संग्रह देखें / Explore the Collection
-                        <Eye className="w-5 h-5" />
+                        <img
+                            src="/images/icons/eyewhite.svg"
+                            alt="eye icon"
+                            className="w-5 h-5"
+                        />
                     </button>
                 </div>
 
@@ -57,16 +61,16 @@ const Hero = () => {
             {/* Bottom Features Section */}
             <section className="w-full bg-[#f3efe9] py-16 md:py-24 border-b border-gray-200">
                 <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
-                    
+
                     {/* Flex Container for Columns */}
                     <div className="flex flex-col md:flex-row items-stretch justify-between gap-10 md:gap-0">
-                        
+
                         {/* Block 1 */}
                         <div className="flex-1 flex items-start gap-5 px-4 xl:px-8">
-                            <img 
-                                src="/images/icons/heroicon1.svg" 
-                                alt="Read slowly" 
-                                className="w-14 lg:w-16 h-auto shrink-0" 
+                            <img
+                                src="/images/icons/heroicon1.svg"
+                                alt="Read slowly"
+                                className="w-14 lg:w-16 h-auto shrink-0"
                             />
                             <div>
                                 <h3 className="text-[16px] lg:text-[18px] font-bold text-black mb-3 leading-snug">
@@ -83,10 +87,10 @@ const Hero = () => {
 
                         {/* Block 2 */}
                         <div className="flex-1 flex items-start gap-5 px-4 xl:px-8">
-                            <img 
-                                src="/images/icons/heroicon2.svg" 
-                                alt="Old roots, new voices" 
-                                className="w-14 lg:w-16 h-auto shrink-0" 
+                            <img
+                                src="/images/icons/heroicon2.svg"
+                                alt="Old roots, new voices"
+                                className="w-14 lg:w-16 h-auto shrink-0"
                             />
                             <div>
                                 <h3 className="text-[16px] lg:text-[18px] font-bold text-black mb-3 leading-snug">
@@ -103,10 +107,10 @@ const Hero = () => {
 
                         {/* Block 3 */}
                         <div className="flex-1 flex items-start gap-5 px-4 xl:px-8">
-                            <img 
-                                src="/images/icons/heroicon3.svg" 
-                                alt="Every book has something to say" 
-                                className="w-14 lg:w-16 h-auto shrink-0" 
+                            <img
+                                src="/images/icons/heroicon3.svg"
+                                alt="Every book has something to say"
+                                className="w-14 lg:w-16 h-auto shrink-0"
                             />
                             <div>
                                 <h3 className="text-[16px] lg:text-[18px] font-bold text-black mb-3 leading-snug">

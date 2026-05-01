@@ -3,13 +3,29 @@
 import React from "react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Plus, Minus } from "lucide-react"; // 🔥 Added icons
+import { ShoppingCart, Plus, Minus, XCircle } from "lucide-react"; // 🔥 Added XCircle icon
 
 const AddToCartButton = ({ product }) => {
   const { cartItems, addToCart, increaseQty, decreaseQty } = useCart();
   const router = useRouter();
 
-  const item = cartItems.find((i) => i.id === product.id);
+  // 🔥 STATE 0: OUT OF STOCK
+  // Check this before anything else!
+  if (product.inStock === false) {
+    return (
+      <button
+        disabled
+        className="flex items-center justify-center gap-2 w-full sm:w-auto bg-gray-200 text-gray-500 text-[14px] font-bold py-3 px-8 rounded-full cursor-not-allowed"
+      >
+        <XCircle className="w-4 h-4" />
+        <span>Out of Stock</span>
+      </button>
+    );
+  }
+
+  // Get current quantity in cart (supports both MongoDB _id and mapped id)
+  const productId = product._id || product.id;
+  const item = cartItems.find((i) => i.id === productId || i._id === productId);
   const quantity = item ? item.quantity : 0;
 
   // 🔥 STATE 1: NOT IN CART
@@ -31,7 +47,7 @@ const AddToCartButton = ({ product }) => {
       
       {/* Decrease Button */}
       <button
-        onClick={() => decreaseQty(product.id)}
+        onClick={() => decreaseQty(productId)}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-900 hover:bg-gray-200 hover:text-red-500 transition-colors shadow-sm active:scale-90"
         aria-label="Decrease quantity"
       >
@@ -45,7 +61,7 @@ const AddToCartButton = ({ product }) => {
 
       {/* Increase Button */}
       <button
-        onClick={() => increaseQty(product.id)}
+        onClick={() => increaseQty(productId)}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-[#111111] text-white hover:bg-[#2a2a2a] transition-colors shadow-sm active:scale-90"
         aria-label="Increase quantity"
       >

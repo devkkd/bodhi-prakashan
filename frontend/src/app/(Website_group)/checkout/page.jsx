@@ -115,6 +115,9 @@ const CheckoutPage = () => {
 
   const orderTotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  // 🔥 Check if any item in the cart is out of stock
+  const hasOutOfStockItems = cartItems.some(item => item.inStock === false);
+
   if (cartItems.length === 0) {
     return (
       <div className="w-full bg-[#fcf9f5] min-h-screen flex flex-col items-center justify-center pt-[220px]">
@@ -239,12 +242,12 @@ const CheckoutPage = () => {
               {/* Order Items List */}
               <div className="flex flex-col gap-4 mb-6 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 items-center border-b border-gray-50 pb-4 last:border-0 last:pb-0">
-                    <div className="w-16 h-20 shrink-0 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                  <div key={item.id} className={`flex gap-4 items-center border-b border-gray-50 pb-4 last:border-0 last:pb-0 ${item.inStock === false ? 'opacity-60' : ''}`}>
+                    <div className="w-16 h-20 shrink-0 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative">
                       <img 
                         src={item.mainImage || item.image || "https://via.placeholder.com/150x200?text=No+Cover"} 
                         alt={item.title}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${item.inStock === false ? 'grayscale' : ''}`}
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = "https://via.placeholder.com/150x200?text=No+Cover";
@@ -253,7 +256,11 @@ const CheckoutPage = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-[14px] font-bold text-black line-clamp-2 leading-tight mb-1">{item.title}</h3>
-                      <p className="text-xs text-gray-500 font-medium mb-1">Qty: {item.quantity}</p>
+                      {item.inStock === false ? (
+                        <p className="text-xs font-bold text-red-500 mb-1">Out of Stock</p>
+                      ) : (
+                        <p className="text-xs text-gray-500 font-medium mb-1">Qty: {item.quantity}</p>
+                      )}
                       <p className="text-[14px] font-black text-black">₹{item.price}</p>
                     </div>
                   </div>
@@ -269,11 +276,19 @@ const CheckoutPage = () => {
                   <span className="text-3xl font-black text-black">₹{orderTotal}</span>
                 </div>
 
+                {/* 🔥 Show warning if out of stock */}
+                {hasOutOfStockItems && (
+                  <div className="w-full mb-4 text-center text-xs font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
+                    An item in your cart went out of stock. Please return to your cart to remove it.
+                  </div>
+                )}
+
                 <button
                   onClick={handlePayment}
-                  disabled={loading || selectedIndex === null}
+                  // 🔥 Disable if loading, no address selected, OR there's an out of stock item
+                  disabled={loading || selectedIndex === null || hasOutOfStockItems}
                   className={`w-full flex items-center justify-center gap-3 py-4 rounded-full font-black text-lg transition-all shadow-md
-                    ${loading || selectedIndex === null 
+                    ${loading || selectedIndex === null || hasOutOfStockItems
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none" 
                       : "bg-[#FCA57D] text-black hover:bg-[#f49368] active:scale-95"}`}
                 >
@@ -286,6 +301,7 @@ const CheckoutPage = () => {
                     "Pay & Complete Order →"
                   )}
                 </button>
+                
                 <p className="mt-4 text-[11px] text-gray-400 font-medium text-center">
                   Secured by Razorpay. 100% Safe Payments.
                 </p>
@@ -301,251 +317,3 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
-
-// "use client";
-
-// import React, { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { useCart } from "@/context/CartContext";
-// import { ChevronLeft, Lock } from "lucide-react";
-// import { createRazorpayOrder, verifyPayment, addAddress } from "@/lib/api";
-
-// const CheckoutPage = () => {
-//   const router = useRouter();
-//   const { cartItems } = useCart();
-
-//   // ✅ FORM STATE
-//   const [form, setForm] = useState({
-//     firstName: "",
-//     lastName: "",
-//     phone: "",
-//     email: "",
-//     address: "",
-//     city: "",
-//     state: "",
-//     pincode: "",
-//   });
-
-//   const [loading, setLoading] = useState(false);
-
-//   // Pricing logic
-//   const totalMRP = cartItems.reduce(
-//     (acc, item) =>
-//       acc + (item.originalPrice || item.price) * item.quantity,
-//     0
-//   );
-//   const totalSellingPrice = cartItems.reduce(
-//     (acc, item) => acc + item.price * item.quantity,
-//     0
-//   );
-//   const discount = totalMRP - totalSellingPrice;
-//   const delivery = 50;
-//   const grandTotal = totalSellingPrice + delivery;
-
-//   if (cartItems.length === 0) {
-//     router.push("/cart");
-//     return null;
-//   }
-
-//   const loadRazorpay = () => {
-//     return new Promise((resolve) => {
-//       const script = document.createElement("script");
-//       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-//       script.onload = () => {
-//         resolve(true);
-//       };
-//       script.onerror = () => {
-//         resolve(false);
-//       };
-//       document.body.appendChild(script);
-//     });
-//   };
-
-//   // ✅ HANDLE INPUT
-//   const handleChange = (e) => {
-//     setForm({ ...form, [e.target.name]: e.target.value });
-//   };
-
-//   // ✅ VALIDATION
-//   const validate = () => {
-//     if (!form.firstName || !form.phone || !form.address) {
-//       alert("Please fill required fields");
-//       return false;
-//     }
-//     if (form.phone.length !== 10) {
-//       alert("Enter valid phone number");
-//       return false;
-//     }
-//     return true;
-//   };
-
-//   // ✅ PAYMENT HANDLER
-//   const handlePayment = async () => {
-//     if (!validate()) return;
-
-//     setLoading(true);
-
-//     try {
-//       const isLoaded = await loadRazorpay();
-//       if (!isLoaded) return alert("Razorpay failed to load");
-
-//       // 🔥 get razorpay order from backend
-//       const { data } = await createRazorpayOrder();
-
-//       const { razorpayOrder } = data;
-
-//       const options = {
-//         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-//         amount: razorpayOrder.amount,
-//         currency: "INR",
-//         order_id: razorpayOrder.id,
-
-//         handler: async function (response) {
-//           console.log("RAZORPAY RESPONSE:", response); // ✅ ADD HERE
-//           try {
-//             // 🔥 save address AFTER payment success
-//             const addressRes = await addAddress(form);
-//             const addressId = addressRes.data._id;
-
-//             await verifyPayment({
-//               ...response,
-//               addressId,
-//             });
-
-//             alert("Payment Successful ✅");
-//             router.push("/success");
-
-//           } catch (err) {
-//             console.log("VERIFY ERROR:", err); // also add this
-//             alert("Verification failed");
-//           }
-//         },
-
-//         modal: {
-//           ondismiss: function () {
-//             alert("Payment cancelled ❌");
-//           }
-//         },
-
-//         prefill: {
-//           name: form.firstName + " " + form.lastName,
-//           contact: form.phone,
-//           email: form.email,
-//         },
-//       };
-
-//       const rzp = new window.Razorpay(options);
-//       rzp.open();
-
-//     } catch (err) {
-//       console.log("Checkout error:", err);
-//       alert("Something went wrong");
-//     }
-
-//     setLoading(false);
-//   };
-
-//   return (
-//     <div className="w-full bg-white text-gray-700 min-h-screen font-sans pb-24 pt-[160px] md:pt-[200px]">
-//       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 flex flex-col gap-12">
-
-//         {/* HEADER */}
-//         <div className="flex flex-col md:flex-row items-center justify-between border-b border-gray-200 pb-6 gap-6">
-
-//           <button
-//             onClick={() => router.push("/cart")}
-//             className="flex items-center gap-2 text-black hover:text-[#F89E6E] transition-colors w-full md:w-1/3 justify-center md:justify-start"
-//           >
-//             <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-//             <span className="text-[14px] font-bold">
-//               Back to Your Books
-//             </span>
-//           </button>
-
-//           <div className="text-center w-full md:w-1/3">
-//             <h1 className="text-[20px] md:text-[24px] font-extrabold text-black">
-//               Checkout
-//             </h1>
-//           </div>
-
-//           <div className="w-full md:w-1/2 flex justify-end">
-//             <button className="bg-[#FCA57D] px-6 py-2.5 rounded-full text-[14px] font-bold">
-//               Sign in →
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* CONTENT */}
-//         <div className="flex flex-col lg:flex-row gap-12">
-
-//           {/* LEFT */}
-//           <div className="flex-1 lg:pr-16">
-
-//             {/* STEP 1 */}
-//             <div className="mb-16">
-//               <h2 className="text-[20px] font-bold mb-6">
-//                 Customer Details
-//               </h2>
-
-//               <div className="grid sm:grid-cols-2 gap-6">
-//                 <input name="firstName" onChange={handleChange} placeholder="First Name" className="border-b" />
-//                 <input name="lastName" onChange={handleChange} placeholder="Last Name" className="border-b" />
-//                 <input name="phone" onChange={handleChange} placeholder="Phone" className="border-b" />
-//                 <input name="email" onChange={handleChange} placeholder="Email" className="border-b" />
-//               </div>
-//             </div>
-
-//             {/* STEP 2 */}
-//             <div className="mb-16">
-//               <h2 className="text-[20px] font-bold mb-6">
-//                 Delivery Details
-//               </h2>
-
-//               <div className="grid sm:grid-cols-2 gap-6">
-//                 <input name="address" onChange={handleChange} placeholder="Address" className="border-b sm:col-span-2" />
-//                 <input name="city" onChange={handleChange} placeholder="City" className="border-b" />
-//                 <input name="state" onChange={handleChange} placeholder="State" className="border-b" />
-//                 <input name="pincode" onChange={handleChange} placeholder="Pincode" className="border-b" />
-
-//                 <button
-//                   onClick={handlePayment}
-//                   className="bg-[#FCA57D] py-4 rounded-full sm:col-span-2"
-//                 >
-//                   {loading ? "Processing..." : "Checkout →"}
-//                 </button>
-//               </div>
-//             </div>
-
-//           </div>
-
-//           {/* RIGHT */}
-//           <div className="w-full lg:w-[450px] border-l pl-8">
-//             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
-
-//             {cartItems.map((item) => (
-//               <div key={item.id} className="flex justify-between mb-2">
-//                 <span>{item.title}</span>
-//                 <span>₹{item.price}</span>
-//               </div>
-//             ))}
-
-//             <hr className="my-4" />
-
-//             <div className="flex justify-between font-bold text-lg">
-//               <span>Total</span>
-//               <span>₹{grandTotal}</span>
-//             </div>
-
-//             <div className="flex items-center gap-2 mt-4 text-gray-600">
-//               <Lock size={16} />
-//               Secure Payment
-//             </div>
-//           </div>
-
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CheckoutPage;

@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const isAdmin = authMiddleware.isAdmin;
 
 const {
   createSubCategory,
@@ -7,8 +9,11 @@ const {
   deleteSubCategory
 } = require("../controllers/subCategoryController");
 
-router.post("/", createSubCategory);
+// 🌍 PUBLIC ROUTE
 router.get("/", getSubCategories);
-router.delete("/:id", deleteSubCategory);
+
+// 🔐 SECURE ADMIN ROUTES
+router.post("/", authMiddleware, isAdmin, createSubCategory);
+router.delete("/:id", authMiddleware, isAdmin, deleteSubCategory);
 
 module.exports = router;

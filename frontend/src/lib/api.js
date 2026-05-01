@@ -5,20 +5,23 @@ const API = axios.create({
   withCredentials: true,
 });
 
-// ✅ FIXED INTERCEPTOR
+// ✅ FIXED INTERCEPTOR: Now checks the browser URL context
 API.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
       const userToken = localStorage.getItem("userToken");
       const adminToken = localStorage.getItem("adminToken");
 
-      const isAdminRoute = config.url?.startsWith("/admin");
+      // 🔥 Look at the current browser page URL, not the API endpoint URL
+      const isFromAdminPanel = window.location.pathname.startsWith("/admin");
 
-      if (isAdminRoute) {
+      if (isFromAdminPanel) {
+        // If they are doing things inside the Admin Dashboard, use the Admin Token
         if (adminToken) {
           config.headers.Authorization = `Bearer ${adminToken}`;
         }
       } else {
+        // Otherwise, use the standard User Token
         if (userToken) {
           config.headers.Authorization = `Bearer ${userToken}`;
         }
@@ -29,6 +32,32 @@ API.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+// 🔥 RESPONSE INTERCEPTOR (Keep this exactly as it is)
+API.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (typeof window !== "undefined" && error.response) {
+      if (error.response.status === 401 || error.response.status === 403) {
+        // 🔥 Also update the response error handling to use the same logic
+        const isFromAdminPanel = window.location.pathname.startsWith("/admin");
+
+        if (isFromAdminPanel) {
+          localStorage.removeItem("adminToken");
+          window.location.href = "/admin/login"; 
+        } else {
+          localStorage.removeItem("userToken");
+          localStorage.removeItem("userMobile");
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ... (KEEP ALL YOUR API EXPORTS EXACTLY THE SAME BELOW THIS)
 
 // ============================
 // 🛠️ ADMIN APIs
@@ -52,6 +81,7 @@ export const getUserById = (id) => API.get(`/admin/users/${id}`); // 🔥 Add th
 
 export const sendOtp = (data) => API.post("/auth/send-otp", data);
 export const verifyOtp = (data) => API.post("/auth/verify-otp", data);
+// 🔥 NEW: Fetch OTP for the popup
 export const getDevOtp = (phone) => API.get(`/auth/dev-otp/${phone}`);
 
 // =====================================================

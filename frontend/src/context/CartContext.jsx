@@ -17,13 +17,11 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  // ✅ CHECK LOGIN
   const isLoggedIn = () => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("userToken");
   };
 
-  // 🔥 FETCH CART
   const fetchCart = async () => {
     if (!isLoggedIn()) {
       setCartItems([]);
@@ -36,9 +34,8 @@ export const CartProvider = ({ children }) => {
       const items = res.data.items || [];
 
       const formatted = items
-        .filter(item => item.productId) // ✅ avoid crash if product was deleted
+        .filter(item => item.productId) 
         .map((item) => {
-          // Extract the main image safely based on the new schema
           const primaryImage = item.productId.mainImage || (item.productId.galleryImages && item.productId.galleryImages[0]) || "";
           
           return {
@@ -47,16 +44,16 @@ export const CartProvider = ({ children }) => {
             price: item.productId.price,
             originalPrice: item.productId.originalPrice,
             mainImage: primaryImage,
-            image: primaryImage, // Kept for backward compatibility with older components
+            image: primaryImage, 
             quantity: item.quantity,
+            // 🔥 FIX: Extract inStock status directly from the populated product
+            inStock: item.productId.inStock ?? true, 
           };
         });
 
       setCartItems(formatted);
     } catch (err) {
       console.error("Fetch cart error:", err);
-
-      // 🔥 If token expired
       if (err.response?.status === 401) {
         localStorage.removeItem("userToken");
         setCartItems([]);
@@ -70,20 +67,15 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [user]);
 
-  // 🔥 ADD (optimistic update)
   const addToCart = async (product, router) => {
     if (!isLoggedIn()) {
-      router.push("/user/login"); // 🔥 redirect instead of alert
+      router.push("/user/login"); 
       return;
     }
 
-    if (!product || !product.id) {
-      console.error("❌ Invalid product");
-      return;
-    }
+    if (!product || !product.id) return;
 
     const productId = product.id;
-    // Safely extract the image from the incoming product object
     const primaryImage = product.mainImage || product.image || "";
 
     setCartItems((prev) => {
@@ -107,6 +99,7 @@ export const CartProvider = ({ children }) => {
           mainImage: primaryImage,
           image: primaryImage, 
           quantity: 1,
+          inStock: product.inStock ?? true, // Track it locally too
         },
       ];
     });
@@ -115,11 +108,10 @@ export const CartProvider = ({ children }) => {
       await addToCartAPI({ productId });
     } catch (err) {
       console.error("Add error:", err);
-      fetchCart(); // Revert optimistic update on failure
+      fetchCart(); 
     }
   };
 
-  // 🔥 INCREASE
   const increaseQty = async (id) => {
     const item = cartItems.find((i) => i.id === id);
     if (!item) return;
@@ -131,17 +123,12 @@ export const CartProvider = ({ children }) => {
     );
 
     try {
-      await updateCart({
-        productId: id,
-        quantity: item.quantity + 1,
-      });
+      await updateCart({ productId: id, quantity: item.quantity + 1 });
     } catch (err) {
-      console.error("Increase error:", err);
-      fetchCart(); // Sync with server on failure
+      fetchCart(); 
     }
   };
 
-  // 🔥 DECREASE
   const decreaseQty = async (id) => {
     const item = cartItems.find((i) => i.id === id);
     if (!item) return;
@@ -151,31 +138,22 @@ export const CartProvider = ({ children }) => {
     setCartItems((prev) =>
       newQty <= 0
         ? prev.filter((i) => i.id !== id)
-        : prev.map((i) =>
-            i.id === id ? { ...i, quantity: newQty } : i
-          )
+        : prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i))
     );
 
     try {
-      await updateCart({
-        productId: id,
-        quantity: newQty,
-      });
+      await updateCart({ productId: id, quantity: newQty });
     } catch (err) {
-      console.error("Decrease error:", err);
-      fetchCart(); // Sync with server on failure
+      fetchCart(); 
     }
   };
 
-  // 🔥 REMOVE
   const removeItem = async (id) => {
     setCartItems((prev) => prev.filter((i) => i.id !== id));
-
     try {
       await removeFromCart(id);
     } catch (err) {
-      console.error("Remove error:", err);
-      fetchCart(); // Sync with server on failure
+      fetchCart(); 
     }
   };
 

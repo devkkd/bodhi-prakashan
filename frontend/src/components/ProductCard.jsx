@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
+    // console.log(product,"productcard")
     // Failsafe
     if (!product) return null;
 

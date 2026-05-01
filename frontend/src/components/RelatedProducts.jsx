@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import ProductCard from './ProductCard'; 
-import { getProducts } from '@/lib/api'; // ✅ API import
+import { getProducts } from '@/lib/api';
 
 const RelatedProducts = ({ currentCategoryId, currentProductId }) => {
   const [allProducts, setAllProducts] = useState([]);
@@ -26,14 +26,13 @@ const RelatedProducts = ({ currentCategoryId, currentProductId }) => {
     if (!currentCategoryId || allProducts.length === 0) return [];
 
     // 1. Filter products by the same category
-    // Using optional chaining (product.category?._id) because MongoDB populates the category as an object
-    // 2. Exclude the product the user is currently viewing
-    const filtered = allProducts.filter(
-      (product) => product.category?._id === currentCategoryId && product._id !== currentProductId
-    );
+    // 🔥 FIX: Safely check if category is an object (populated) or just a string ID
+    const filtered = allProducts.filter((product) => {
+      const productCatId = product.category?._id || product.category;
+      return productCatId === currentCategoryId && product._id !== currentProductId;
+    });
 
     // 3. Optional: Shuffle the array so it shows different related books each time 
-    // (Remove the .sort line if you just want the newest/first ones always)
     const shuffled = filtered.sort(() => 0.5 - Math.random());
 
     // 4. Return exactly max 5 products
@@ -56,26 +55,12 @@ const RelatedProducts = ({ currentCategoryId, currentProductId }) => {
 
         {/* Products Grid */}
         <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 sm:gap-x-6 xl:gap-8">
-          {relatedProducts.map((product) => {
-            
-            // 🔥 Calculate dynamic discount if the backend only sends originalPrice & price
-            const displayDiscount = product.discount || (product.originalPrice && product.price < product.originalPrice
-              ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
-              : null);
-
-            return (
-              <div key={product._id} className="w-full flex justify-center">
-                <ProductCard 
-                  id={product._id} // Added id so clicking the card routes correctly
-                  image={product.images && product.images.length > 0 ? product.images[0] : ""} 
-                  title={product.title}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  discount={displayDiscount}
-                />
-              </div>
-            );
-          })}
+          {relatedProducts.map((product) => (
+            <div key={product._id} className="w-full flex justify-center">
+              {/* 🔥 FIX: Just pass the product object directly like you do in ProductDetailPage */}
+              <ProductCard product={product} />
+            </div>
+          ))}
         </div>
 
       </div>

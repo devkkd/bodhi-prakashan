@@ -45,12 +45,9 @@ const StoreContent = () => {
           getSubCategories()
         ]);
 
-        // Ensure we are accessing the correct path in the response
-        // Sometimes axios returns data directly or wrapped in a data property
         const rawProducts = prodRes.data || [];
         
         const formattedProducts = rawProducts.map(p => {
-          // Determine the image URL
           let imageUrl = "/placeholder-book.png";
           if (p.mainImage) {
             imageUrl = p.mainImage;
@@ -61,12 +58,13 @@ const StoreContent = () => {
           return {
             id: p._id,
             title: p.title,
+            writer: p.writer, // Always good to pass this along
             price: p.price,
             originalPrice: p.originalPrice,
+            inStock: p.inStock ?? true, // 🔥 FIX: Passed inStock here!
             discount: p.originalPrice && p.price < p.originalPrice
               ? `${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF`
               : "",
-            // This 'image' key must match what ProductCard expects
             image: imageUrl, 
             gallery: p.galleryImages || [],
             categoryId: p.category?._id,

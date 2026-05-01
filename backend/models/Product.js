@@ -11,7 +11,6 @@ const productSchema = new mongoose.Schema({
   originalPrice: Number,
 
   inStock: { type: Boolean, default: true },
-  stock: { type: Number, default: 0 },
 
   // ✅ NEW
   mainImage: { type: String, required: true },

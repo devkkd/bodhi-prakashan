@@ -1,6 +1,7 @@
-//backend\routes\categoryRoutes.js
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const isAdmin = authMiddleware.isAdmin;
 
 const {
   addCategory,
@@ -8,9 +9,11 @@ const {
   deleteCategory
 } = require("../controllers/categoryController");
 
-router.post("/", addCategory);
+// 🌍 PUBLIC ROUTE
 router.get("/", getCategories);
-router.delete("/:id", deleteCategory);
+
+// 🔐 SECURE ADMIN ROUTES
+router.post("/", authMiddleware, isAdmin, addCategory);
+router.delete("/:id", authMiddleware, isAdmin, deleteCategory);
 
 module.exports = router;
-

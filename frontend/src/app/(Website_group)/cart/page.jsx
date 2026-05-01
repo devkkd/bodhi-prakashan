@@ -3,10 +3,14 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { AlertCircle, Trash2 } from "lucide-react"; // 🔥 Icons for warnings
 
 const CartPage = () => {
   const router = useRouter();
   const { cartItems, increaseQty, decreaseQty, removeItem } = useCart();
+
+  // 🔥 Check if ANY item in the cart is out of stock
+  const hasOutOfStockItems = cartItems.some(item => item.inStock === false);
 
   // Dynamic Pricing Logic based on actual item prices
   const totalMRP = cartItems.reduce(
@@ -20,19 +24,15 @@ const CartPage = () => {
   );
 
   const discount = totalMRP - totalSellingPrice;
-  
-  // Changed delivery to 0 to remove it from calculations
   const delivery = 0; 
   const grandTotal = totalSellingPrice + delivery;
 
   const handleCheckout = () => {
     const token = localStorage.getItem("userToken");
-
     if (!token) {
       router.push("/login?redirect=/checkout");
       return;
     }
-
     router.push("/checkout");
   };
 
@@ -67,23 +67,27 @@ const CartPage = () => {
             {cartItems.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-6 border-b border-gray-200 py-8 items-start"
+                className={`flex gap-6 border-b border-gray-200 py-8 items-start transition-opacity ${item.inStock === false ? "opacity-70" : ""}`}
               >
-                <div className="w-[100px] md:w-[120px] aspect-[2/3] shrink-0 bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
+                {/* Image */}
+                <div className="w-[100px] md:w-[120px] aspect-[2/3] shrink-0 bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden relative">
                   <img
-                    // 🔥 UPDATED: Prioritize mainImage, fallback to image (for cached items), then placeholder
                     src={item.mainImage || item.image || "https://via.placeholder.com/300x450?text=No+Cover"}
                     alt={item.title}
-                    className="w-full h-full object-cover"
-                    // 🔥 UPDATED: Prevents infinite 404 loop
+                    className={`w-full h-full object-cover ${item.inStock === false ? "grayscale" : ""}`}
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = "https://via.placeholder.com/300x450?text=No+Cover";
                     }}
                   />
+                  {item.inStock === false && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <span className="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-1 rounded">Out of Stock</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col h-full">
                   <h2 className="text-[16px] md:text-[18px] font-semibold text-black leading-snug mb-3">
                     {item.title}
                   </h2>
@@ -101,29 +105,26 @@ const CartPage = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-6 mt-auto">
-                    <div className="flex items-center gap-4 border border-gray-300 rounded-full px-5 py-1.5 w-fit bg-white">
-                      <button
-                        onClick={() => decreaseQty(item.id)}
-                        className="text-gray-600 hover:text-black text-lg font-medium w-4 flex justify-center"
-                      >
-                        −
-                      </button>
-                      <span className="text-[15px] font-bold text-black w-4 flex justify-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => increaseQty(item.id)}
-                        className="text-gray-600 hover:text-black text-lg font-medium w-4 flex justify-center"
-                      >
-                        +
-                      </button>
-                    </div>
+                    {/* 🔥 SHOW DIFFERENT CONTROLS IF OUT OF STOCK */}
+                    {item.inStock === false ? (
+                      <div className="flex items-center gap-2 text-red-600 font-bold bg-red-50 px-4 py-2 rounded-lg border border-red-100">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-sm">Please remove to continue</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-4 border border-gray-300 rounded-full px-5 py-1.5 w-fit bg-white">
+                        <button onClick={() => decreaseQty(item.id)} className="text-gray-600 hover:text-black text-lg font-medium w-4 flex justify-center">−</button>
+                        <span className="text-[15px] font-bold text-black w-4 flex justify-center">{item.quantity}</span>
+                        <button onClick={() => increaseQty(item.id)} className="text-gray-600 hover:text-black text-lg font-medium w-4 flex justify-center">+</button>
+                      </div>
+                    )}
 
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-[14px] text-gray-800 font-medium hover:text-black transition-colors"
+                      className={`flex items-center gap-1.5 text-[14px] font-bold transition-colors ${item.inStock === false ? "text-red-500 hover:text-red-700 bg-red-50 px-4 py-2 rounded-full" : "text-gray-800 hover:text-black"}`}
                     >
-                      बाद के लिए रखें / Save for later
+                      {item.inStock === false && <Trash2 className="w-4 h-4" />}
+                      {item.inStock === false ? "Remove Item" : "बाद के लिए रखें / Save for later"}
                     </button>
                   </div>
                 </div>
@@ -144,13 +145,10 @@ const CartPage = () => {
                 <span>Total MRP</span>
                 <span className="font-bold">₹{totalMRP.toFixed(2)}</span>
               </div>
-
               <div className="flex justify-between text-[#F89E6E]">
                 <span>Discount on MRP</span>
                 <span className="font-bold">-₹{discount.toFixed(2)}</span>
               </div>
-              
-              {/* Delivery row has been removed from here */}
             </div>
 
             <div className="border-t border-gray-300 my-6"></div>
@@ -160,9 +158,21 @@ const CartPage = () => {
               <span>₹{grandTotal.toFixed(2)}</span>
             </div>
 
+            {/* 🔥 DISABLE CHECKOUT IF OUT OF STOCK ITEMS EXIST */}
+            {hasOutOfStockItems && (
+              <div className="mb-4 text-center text-sm font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
+                You have out-of-stock items in your cart. Please remove them to checkout.
+              </div>
+            )}
+
             <button
               onClick={handleCheckout}
-              className="w-full bg-[#FCA57D] hover:bg-[#f49368] text-black py-4 rounded-full font-bold transition-all"
+              disabled={hasOutOfStockItems}
+              className={`w-full py-4 rounded-full font-bold transition-all ${
+                hasOutOfStockItems 
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
+                  : "bg-[#FCA57D] hover:bg-[#f49368] text-black"
+              }`}
             >
               Checkout →
             </button>

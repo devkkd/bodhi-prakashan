@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
-const Order = require("../models/Order"); // 🔥 Added import to prevent crash
+const isAdmin = authMiddleware.isAdmin; // 🔥 IMPORT ADMIN LOCK
+const Order = require("../models/Order"); 
 
 const {
   createRazorpayOrder,
@@ -24,12 +25,11 @@ router.get("/", authMiddleware, getOrders);
 
 
 // =====================================
-// 🔐 ADMIN ROUTES (or protected)
+// 🔐 ADMIN ROUTES (Strictly Protected)
 // =====================================
 
 // Update Order Status
-// NOTE: You should ideally add an isAdmin middleware here
-router.put("/status/:id", authMiddleware, async (req, res) => {
+router.put("/status/:id", authMiddleware, isAdmin, async (req, res) => {
   try {
     const { status } = req.body;
     
