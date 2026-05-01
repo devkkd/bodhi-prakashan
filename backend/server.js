@@ -1,11 +1,38 @@
-// backend\server.js
 require("dotenv").config();
 
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
-const cors = require("cors"); // ✅ ADD THIS
+const cors = require("cors");
 
+const app = express();
+
+// ✅ PORT FIX (Render requires this)
+const PORT = process.env.PORT || 5000;
+
+// ✅ CORS FIX (allow frontend, not backend)
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.FRONTEND_URL // set this in Render
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("CORS not allowed: " + origin));
+    }
+  },
+  credentials: true
+}));
+
+// ✅ Middleware
+app.use(express.json());
+
+// ✅ ROUTES IMPORT
 const authRoutes = require("./routes/authRoutes");
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
@@ -18,18 +45,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const inquiryRoutes = require("./routes/inquiryRoutes");
 
-// 🔥 CORS CONFIG (THIS IS THE FIX)
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://bodhi-prakashan.onrender.com"
-  ],
-  credentials: true
-}));
-
-app.use(express.json());
-
-// ROUTES
+// ✅ ROUTES
 app.use("/api/auth", authRoutes);
 
 app.get("/api/protected", authMiddleware, (req, res) => {
@@ -49,15 +65,33 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 
-
-// DB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("DB connected"))
-  .catch(err => console.log(err));
-
-// TEST
+// ✅ ROOT TEST
 app.get("/", (req, res) => {
   res.send("API running");
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// ✅ DB CONNECTION (with better logging)
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000
+})
+  .then(() => {
+    console.log("✅ MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:");
+    console.error(err.message);
+  });
+
+// ✅ GLOBAL ERROR HANDLER (basic but useful)
+app.use((err, req, res, next) => {
+  console.error("🔥 Server Error:", err.message);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error"
+  });
+});
+
+// ✅ START SERVER
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

@@ -52,6 +52,7 @@ export const getUserById = (id) => API.get(`/admin/users/${id}`); // 🔥 Add th
 
 export const sendOtp = (data) => API.post("/auth/send-otp", data);
 export const verifyOtp = (data) => API.post("/auth/verify-otp", data);
+export const getDevOtp = (phone) => API.get(`/auth/dev-otp/${phone}`);
 
 // =====================================================
 // 👤 USER APIs
