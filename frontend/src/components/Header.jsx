@@ -231,16 +231,16 @@ const Header = () => {
             </button>
 
             {/* 🔥 Desktop/Tablet Search Bar */}
-            <div className="relative hidden md:block" ref={desktopSearchRef}>
+            <div className="relative hidden md:block text-black " ref={desktopSearchRef}>
               <form onSubmit={handleSearch}>
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 cursor-pointer" onClick={handleSearch} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer" onClick={handleSearch} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)} // Open dropdown
                   placeholder="Find अगली किताब..."
-                  className="pl-10 pr-4 py-1.5 w-48 lg:w-56 xl:w-72 bg-white/50 border border-orange-900/20 rounded-full text-[13px] focus:outline-none focus:border-orange-900/50 focus:bg-white placeholder-gray-700 transition-colors relative z-10"
+                  className="pl-10 pr-4 py-1.5 w-48 lg:w-56 xl:w-72 bg-white/80 border border-orange-900/20 rounded-full text-[13px] focus:outline-none focus:border-orange-900/50 focus:bg-white placeholder-gray-900 transition-colors relative z-10"
                 />
               </form>
               <SearchResultsDropdown />
