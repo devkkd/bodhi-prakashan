@@ -208,7 +208,7 @@ export default function ProductForm({ mode, productId }) {
   const CardClass = "bg-white rounded-2xl shadow-sm border border-[#FFE7D1] p-6 md:p-8 mb-8";
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-10 font-sans text-[#7a4f2b]">
+    <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-10  text-[#7a4f2b]">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">

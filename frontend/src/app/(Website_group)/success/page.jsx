@@ -8,7 +8,7 @@ const SuccessPage = () => {
 
   return (
     /* Change 1: Use h-fit and flex-col with top padding to ensure it stays clear of header/footer */
-    <div className="w-full bg-[#fcf9f5] flex flex-col items-center justify-start px-4 pt-[200px] pb-24">
+    <div className="w-full bg-white flex flex-col items-center justify-start px-4 pt-[200px] pb-24">
       
       {/* Change 2: Reduced max-width and internal padding for a tighter, "less big" card */}
       <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-10 max-w-[380px] w-full text-center border border-gray-50">

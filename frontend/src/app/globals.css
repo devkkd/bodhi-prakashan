@@ -11,7 +11,7 @@
   --color-foreground: var(--foreground);
 
   /* ✅ CHANGE HERE */
-  --font-sans: var(--font-mona-sans);
+  --: var(--font-mona-sans);
 
   /* optional */
   --font-mono: monospace;

@@ -5,7 +5,6 @@ import { Heart } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
-    // console.log(product,"productcard")
     // Failsafe
     if (!product) return null;
 
@@ -13,13 +12,12 @@ const ProductCard = ({ product }) => {
     const productId = product._id || product.id;
 
     // 🔥 FIX: Match the property name 'image' sent from StorePage mapping
-    // Also added a fallback check for 'mainImage' directly from API
     const imageSrc = product.image || product.mainImage || "/placeholder.jpg";
 
     return (
-        <Link href={`/products/${productId}`} className="flex flex-col w-full max-w-[300px] font-sans group cursor-pointer">
+        <Link href={`/products/${productId}`} className="flex flex-col w-full h-full  group cursor-pointer">
             {/* Image Container */}
-            <div className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.05)] bg-gray-100">
+            <div className="relative w-full aspect-[2/3] rounded-xl sm:rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.05)] bg-gray-100 flex-shrink-0">
                 <img
                     src={imageSrc}
                     alt={product.title || "Product"}
@@ -34,40 +32,40 @@ const ProductCard = ({ product }) => {
                         e.preventDefault();
                         e.stopPropagation();
                     }}
-                    className="absolute bottom-4 left-4 bg-white p-2.5 rounded-full shadow-md hover:scale-110 transition-transform duration-200 focus:outline-none z-10"
+                    className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 bg-white p-2 sm:p-2.5 rounded-full shadow-md hover:scale-110 transition-transform duration-200 focus:outline-none z-10"
                 >
-                    <Heart className="w-5 h-5 text-[#f47c48]" strokeWidth={1.5} />
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-[#f47c48]" strokeWidth={1.5} />
                 </button>
             </div>
 
             {/* Card Content */}
-            <div className="mt-4 flex flex-col pr-2">
+            <div className="mt-3 sm:mt-4 flex flex-col flex-1 pr-1 sm:pr-2">
                 {/* Title */}
-                <h3 className="text-[16px] font-bold text-black leading-snug line-clamp-2 min-h-[44px]">
+                <h3 className="text-[14px] sm:text-[16px] font-bold text-black leading-snug line-clamp-2 min-h-[40px] sm:min-h-[44px]">
                     {product.title}
                 </h3>
 
                 {/* Pricing Row */}
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className="text-[18px] font-extrabold text-black tracking-tight">
+                <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2 flex-wrap">
+                    <span className="text-[16px] sm:text-[18px] font-extrabold text-black tracking-tight">
                         ₹{product.price}
                     </span>
                     
                     {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-[14px] font-medium text-gray-400 line-through">
+                        <span className="text-[12px] sm:text-[14px] font-medium text-gray-400 line-through">
                             ₹{product.originalPrice}
                         </span>
                     )}
 
                     {product.discount && (
-                         <span className="text-[14px] font-semibold text-[#f47c48]">
+                         <span className="text-[12px] sm:text-[14px] font-semibold text-[#f47c48]">
                             {product.discount}
                         </span>
                     )}
                 </div>
 
-                {/* Action Button */}
-                <div className='pt-4' onClick={(e) => {
+                {/* Action Button - Pushed to bottom to keep grid uniform */}
+                <div className='pt-3 sm:pt-4 mt-auto' onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}>

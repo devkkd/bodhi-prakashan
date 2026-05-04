@@ -66,7 +66,7 @@ const AddressPage = () => {
     if (loading) return <div className="p-20 text-center">Loading Addresses...</div>;
 
     return (
-        <div className="min-h-screen bg-[#FFFEF5] pt-[230px] pb-20 px-4 lg:px-8">
+        <div className="min-h-screen bg-[#FFFEF5] pt-[120px] lg:pt-[250px] pb-20 px-4 lg:px-8">
             <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row gap-12">
 
                 {/* LEFT SIDEBAR */}

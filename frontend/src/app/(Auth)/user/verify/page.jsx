@@ -124,7 +124,7 @@ function VerifyContent() {
   const isOtpComplete = otp.join("").length === 6;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4  relative overflow-hidden">
       
       {/* 🔥 DEV MODE FLOATING POPUP */}
       {devOtp && (

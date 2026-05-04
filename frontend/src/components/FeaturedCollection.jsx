@@ -25,25 +25,25 @@ const FeaturedCollection = () => {
           getCategories()
         ]);
 
-        // 🔥 PRODUCTS FORMAT (Updated for mainImage)
+        // 🔥 PRODUCTS FORMAT 
         const formattedProducts = prodRes.data.map(p => {
-          // Determine the primary image securely based on the new schema
           const primaryImage = p.mainImage || (p.galleryImages && p.galleryImages[0]) || "/placeholder.jpg";
 
           return {
             id: p._id,
             title: p.title,
+            writer: p.writer, 
             price: p.price,
             originalPrice: p.originalPrice,
+            inStock: p.inStock ?? true, // 🔥 ADDED THIS SO PRODUCT CARD KNOWS
             discount: p.originalPrice && p.price < p.originalPrice
               ? `${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF`
               : "",
-            image: primaryImage, // 🔥 This now matches exactly what ProductCard expects
+            image: primaryImage, 
             categoryId: p.category?._id
           };
         });
 
-        // CATEGORIES FORMAT (REAL DB)
         const formattedCategories = catRes.data.map(c => ({
           id: c._id,
           nameHindi: c.nameHindi,
@@ -89,29 +89,29 @@ Memoirs, travelogues, and essays that capture the raw, unfiltered truth of the h
   );
 
   return (
-    <section className="w-full bg-[#fcf9f5] pt-10 md:pt-16">
-      <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
+    <section className="w-full bg-white py-12 md:py-16 lg:py-20">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* HEADER */}
-        <div className="mb-16">
-          <div className="inline-block border-b-2 border-[#f47c48] pb-1 mb-6">
-            <h2 className="text-[#f47c48] text-sm font-bold tracking-wider uppercase">
+        <div className="mb-10 md:mb-16">
+          <div className="inline-block border-b-2 border-[#f47c48] pb-1 mb-4 md:mb-6">
+            <h2 className="text-[#f47c48] text-xs md:text-sm font-bold tracking-wider uppercase">
               Featured Collections
             </h2>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
+          <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black tracking-tight">
               आज क्या पढ़ें?
             </h1>
-            <p className="text-gray-700 text-[15px] font-medium pb-1 md:pb-2">
+            <p className="text-gray-700 text-[14px] sm:text-[15px] font-medium pb-1 md:pb-2">
               Collection names that feel editorial, not categorical:
             </p>
           </div>
         </div>
 
         {/* COLLECTIONS */}
-        <div className="flex flex-col gap-8 md:gap-12">
+        <div className="flex flex-col gap-14 md:gap-16 lg:gap-20">
           {featuredCategories.map((category) => {
 
             const content = editorialContent[category.id];
@@ -123,26 +123,29 @@ Memoirs, travelogues, and essays that capture the raw, unfiltered truth of the h
             if (!content) return null;
 
             return (
-              <div key={category.id} className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
+              <div key={category.id} className="flex flex-col lg:flex-row items-start gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
 
-                {/* LEFT */}
-                <div className="w-full lg:w-[280px] flex-shrink-0 flex flex-col items-start pt-2">
-                  <h3 className="text-2xl md:text-[28px] font-bold text-black mb-4 leading-tight">
+                {/* LEFT: Text Content */}
+                <div className="w-full lg:w-[280px] xl:w-[320px] flex-shrink-0 flex flex-col items-start pt-2">
+                  <h3 className="text-2xl sm:text-[26px] md:text-[28px] font-bold text-black mb-3 md:mb-4 leading-tight">
                     {content.title}
                   </h3>
-                  <p className="text-[15px] text-gray-700 whitespace-pre-line mb-8 leading-relaxed pr-4">
+                  <p className="text-[14px] sm:text-[15px] text-gray-700 whitespace-pre-line mb-6 md:mb-8 leading-relaxed lg:pr-4">
                     {content.description}
                   </p>
-                  <button className="bg-[#f8b48f] hover:bg-[#f4a261] text-black text-[14px] font-medium py-2.5 px-6 rounded-full transition-colors">
+                  <button className="bg-[#f8b48f] hover:bg-[#f4a261] text-black text-[13px] md:text-[14px] font-medium py-2.5 px-6 rounded-full transition-colors w-full sm:w-auto">
                     {content.linkText}
                   </button>
                 </div>
 
-                {/* RIGHT */}
-                <div className="w-full flex-1 overflow-x-auto pb-6 no-scrollbar">
-                  <div className="flex gap-4 md:gap-6 min-w-max pr-4">
+                {/* RIGHT: Edge-to-edge swipable slider on mobile */}
+                <div className="w-full flex-1 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  <div className="flex gap-4 sm:gap-5 md:gap-6 min-w-max pr-4 sm:pr-0">
                     {rowProducts.map(product => (
-                      <div key={product.id} className="w-[120px] md:w-[180px] flex-shrink-0">
+                      <div 
+                        key={product.id} 
+                        className="w-[140px] sm:w-[160px] md:w-[180px] xl:w-[200px] flex-shrink-0 snap-start"
+                      >
                         <ProductCard product={product} />
                       </div>
                     ))}

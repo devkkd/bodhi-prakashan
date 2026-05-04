@@ -65,7 +65,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pt-[180px] md:pt-[230px] pb-20 px-4 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#FDFBF7] pt-[120px] lg:pt-[250px] pb-20 px-4 lg:px-8 ">
       <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row gap-12">
         
         <MyAccSidebar logout={logout} />

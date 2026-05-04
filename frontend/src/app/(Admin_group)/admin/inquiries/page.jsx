@@ -64,7 +64,7 @@ export default function InquiriesAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-10 font-sans text-[#7a4f2b]">
+    <div className="min-h-screen bg-[#FDFBF7] p-6 md:p-10  text-[#7a4f2b]">
       <div className="max-w-6xl mx-auto">
         
         {/* HEADER */}

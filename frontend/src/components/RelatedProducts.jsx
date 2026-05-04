@@ -45,7 +45,7 @@ const RelatedProducts = ({ currentCategoryId, currentProductId }) => {
   }
 
   return (
-    <section className="w-full bg-[#fcf9f5] py-16 md:py-24 border-t border-gray-200 font-sans">
+    <section className="w-full bg-white py-16 md:py-24 border-t border-gray-200 ">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
         
         {/* Section Title */}

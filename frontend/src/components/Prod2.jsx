@@ -46,11 +46,11 @@ const Prod2 = () => {
 
   // Hydration mismatch prevention
   if (!isMounted) {
-    return <section className="w-full bg-[#fcf9f5] min-h-[800px]"></section>;
+    return <section className="w-full bg-white min-h-[800px]"></section>;
   }
 
   return (
-    <section className="w-full bg-[#fcf9f5] py-16 md:py-24">
+    <section className="w-full bg-white py-16 md:py-24">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 flex flex-col items-center">
 
         <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 sm:gap-x-6 xl:gap-8">

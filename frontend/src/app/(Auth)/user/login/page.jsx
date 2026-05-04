@@ -35,7 +35,7 @@ export default function LoginPage() {
   const isPhoneValid = phone.length === 10;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 ">
       
       {/* Main Login Card */}
       <div className="w-full max-w-[510px] bg-[#FDFBF7] border border-[#D0C5B7] rounded-[36px] p-4 md:p-8 shadow-sm">

@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
 
     return (
         <div className='w-full bg-white'>
-            <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-12 font-sans pt-[180px] md:pt-[220px]">
+            <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-12  pt-[180px] md:pt-[220px]">
 
                 {/* --- TOP SECTION --- */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
@@ -103,7 +103,7 @@ export default function ProductDetailPage() {
                                     <img 
                                         src={img} 
                                         alt={`Thumbnail ${idx}`} 
-                                        className="w-full h-full object-cover bg-[#fcf9f5]" 
+                                        className="w-full h-full object-cover bg-white" 
                                         onError={(e) => { e.target.src = "/placeholder.jpg"; }}
                                     />
                                 </button>
@@ -111,7 +111,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Main Image */}
-                        <div className="relative flex-1 aspect-[2/3] bg-[#fcf9f5] rounded-3xl overflow-hidden border border-gray-100 shadow-sm group">
+                        <div className="relative flex-1 aspect-[2/3] bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm group">
                             <img 
                                 src={displayImages[selectedImage]} 
                                 alt={product.title} 
@@ -164,7 +164,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {product.note && (
-                            <div className="bg-[#fcf9f5] border-l-4 border-[#F89E6E] p-4 rounded-r-xl mb-10">
+                            <div className="bg-white border-l-4 border-[#F89E6E] p-4 rounded-r-xl mb-10">
                                 <p className="text-[14px] font-semibold text-[#d4703a] flex items-start gap-2">
                                     <Info className="w-4 h-4 mt-0.5 shrink-0" />
                                     <span>{product.note}</span>
@@ -189,7 +189,7 @@ export default function ProductDetailPage() {
                     
                     {/* LEFT: Book Details Card */}
                     <div className="w-full lg:w-[350px] shrink-0">
-                        <div className="bg-[#fcf9f5] border border-orange-900/10 p-6 md:p-8 rounded-3xl h-max">
+                        <div className="bg-white border border-orange-900/10 p-6 md:p-8 rounded-3xl h-max">
                             <h3 className="text-xl font-extrabold text-black mb-6">Book Details</h3>
                             <ul className="space-y-4 text-[14px] text-gray-700">
                                 <li className="flex flex-col"><span className="text-[12px] font-medium text-gray-400 uppercase mb-0.5">Writer</span> <span className="font-semibold text-black">{product.writer || "Unknown"}</span></li>

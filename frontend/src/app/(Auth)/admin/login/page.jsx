@@ -34,7 +34,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4 ">
       
       <div className="w-full max-w-[420px] bg-white border border-[#FFE7D1] rounded-[32px] p-8 md:p-10 shadow-sm relative overflow-hidden">
         

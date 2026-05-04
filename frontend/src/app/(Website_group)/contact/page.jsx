@@ -49,7 +49,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <div className="w-full bg-[#fcf9f5] min-h-screen font-sans pt-[160px]">
+      <div className="w-full bg-white min-h-screen  pt-[160px]">
         
         {/* --- PAGE HEADER --- */}
         <div className="w-full bg-[#FFE8CC] py-8 md:py-12 border-b border-orange-900/10">
